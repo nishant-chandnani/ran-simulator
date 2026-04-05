@@ -11,20 +11,21 @@ pipeline {
 
         stage('Build CU Image') {
             steps {
-                sh 'docker build -t ran-simulator-cu /workspace/cu-service'
+                sh 'docker build -t ran-simulator-cu:latest /workspace/cu-service'
             }
         }
 
         stage('Build DU Image') {
             steps {
-                sh 'docker build -t ran-simulator-du /workspace/du-service'
+                sh 'docker build -t ran-simulator-du:latest /workspace/du-service'
             }
         }
 
         stage('Load Images into kind') {
             steps {
-                sh 'kind load docker-image ran-simulator-cu'
-                sh 'kind load docker-image ran-simulator-du'
+                sh 'docker images | grep ran-simulator || true'
+                sh 'kind load docker-image ran-simulator-cu:latest'
+                sh 'kind load docker-image ran-simulator-du:latest'
             }
         }
 
