@@ -23,13 +23,15 @@ pipeline {
 
         stage('Load Images into kind') {
             steps {
-            echo "Loading images directly into kind containerd..."
+                echo "Loading images directly into kind containerd..."
 
-            docker save ran-simulator-cu:latest | docker exec -i kind-control-plane ctr -n k8s.io images import -
-            docker save ran-simulator-du:latest | docker exec -i kind-control-plane ctr -n k8s.io images import -
+                sh '''
+                docker save ran-simulator-cu:latest | docker exec -i kind-control-plane ctr -n k8s.io images import -
+                docker save ran-simulator-du:latest | docker exec -i kind-control-plane ctr -n k8s.io images import -
 
-            echo "Verifying images inside kind..."
-            docker exec kind-control-plane ctr -n k8s.io images ls | grep ran-simulator || true
+                echo "Verifying images inside kind..."
+                docker exec kind-control-plane ctr -n k8s.io images ls | grep ran-simulator || true
+                '''
             }
         }
 
