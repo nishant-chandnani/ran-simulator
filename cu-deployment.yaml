@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cu-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cu
+  template:
+    metadata:
+      labels:
+        app: cu
+    spec:
+      containers:
+      - name: cu
+        image: ran-simulator-cu
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8001

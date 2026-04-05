@@ -1,0 +1,25 @@
+services:
+
+  cu:
+    build: ./cu-service
+    container_name: cu-container
+    ports:
+      - "8001:8001"
+    networks:
+      - ran-network
+
+  du:
+    build: ./du-service
+    container_name: du-container
+    ports:
+      - "8000:8000"
+    environment:
+      - CU_URL=http://cu:8001/attach
+    depends_on:
+      - cu
+    networks:
+      - ran-network
+
+networks:
+  ran-network:
+    driver: bridge

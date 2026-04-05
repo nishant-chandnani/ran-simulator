@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: du-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: du
+  template:
+    metadata:
+      labels:
+        app: du
+    spec:
+      containers:
+      - name: du
+        image: ran-simulator-du
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+        env:
+        - name: CU_URL
+          value: "http://cu-service:8001/attach"

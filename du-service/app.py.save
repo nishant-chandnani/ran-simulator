@@ -1,0 +1,49 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+import requests
+import time
+import logging
+
+app = FastAPI()
+
+logging.basicConfig(level=logging.INFO)
+
+# IMPORTANT: Replace with your CU IP
+CU_URL = "http://localhost:8001/attach"
+
+class UERequest(BaseModel):
+    ue_id: str
+
+@app.post("/attach")
+def attach(req: UERequest):
+    start_time = time.time()
+
+    try:
+        # Forward request to CU
+        cu_response = requests.post(CU_URL, json={"ue_id": req.ue_id}, timeout=2)
+
+        total_time = (time.time() - start_time) * 1000
+
+        logging.info(f"{req.ue_id} → DU forwarded to CU")
+
+        return {
+            "du_status": "FORWARDED",
+            "cu_response": cu_response.json(),
+            "end_to_end_latency_ms": round(total_time, 2)
+        }
+
+    except requests.exceptions.Timeout:
+        logging.error(f"{req.ue_id} → CU TIMEOUT")
+
+        return {
+            "du_status": "FAILED",
+            "reason": "CU_TIMEOUT"
+        }
+
+    except Exception as e:
+        logging.error(f"{req.ue_id} → ERROR: {str(e)}")
+
+        return {
+            "du_status": "FAILED",
+            "reason": "CU_UNREACHABLE"
+        }
